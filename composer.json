@@ -1,7 +1,7 @@
 {
   "name": "oleics/ac-build-phar",
   "description": "Simplifies the creation of phar-files (PHP Archives) for composer-packages.",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "authors": [
     {
       "name": "Oliver Leics",
@@ -13,9 +13,7 @@
     "php": ">=5.2.0"
   },
   "autoload": {
-    "psr-4": {
-    }
+    "psr-4": {}
   },
-  "repositories": [
-  ]
+  "repositories": []
 }
