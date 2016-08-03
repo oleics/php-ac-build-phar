@@ -17,13 +17,13 @@ Usage
 In a folder of a composer-package:
 
 ```sh
-php -dphar.readonly=0 vendor/oleics/ac-build-phar/bin/cli.php mylib.phar
+php -dphar.readonly=0 vendor/oleics/ac-build-phar/bin/cli.php --phar mylib.phar
 ```
 
 Specify a main:
 
 ```sh
-php -dphar.readonly=0 vendor/oleics/ac-build-phar/bin/cli.php myapp.phar bin/cli.php
+php -dphar.readonly=0 vendor/oleics/ac-build-phar/bin/cli.php --phar myapp.phar --require bin/cli.php
 chmod +x myapp.phar
 ```
 

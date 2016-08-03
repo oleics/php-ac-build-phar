@@ -1,21 +1,51 @@
 #!/usr/bin/env php
 <?php
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use Ac\Minimist;
+
 function usage($msg = null) {
   if($msg) {
     echo "$msg\n";
   }
-  echo "Usage: php -dphar.readonly=0 build-phar.php phar-filename [main-filename]\n";
+  echo "Usage: php -dphar.readonly=0 ".$GLOBALS['argv'][0]." [--phar phar-filename] [--require main-filename] [--license license-file] [--copyright copyright-file]\n";
   die();
 }
+
+$opts = (object) Minimist::parse($argv, [
+  'string' => [
+    'source',
+    'phar',
+    'require',
+    'license',
+    'copyright'
+  ],
+  'default' => [
+    'source' => function() {
+      return getcwd();
+    },
+    'phar' => function() {
+      if(file_exists('composer.json')) {
+        $name = @json_decode(file_get_contents('composer.json'))->name;
+        $name = @preg_replace('/\W/', '', basename($name));
+        if(empty($name)) return false;
+      }
+      return $name.'.phar';
+    },
+  ],
+]);
+
+print_r($opts);
+// exit(0);
 
 //
 if(ini_get('phar.readonly')) usage('Missing php-option "phar.readonly=1"');
 
 //
-if(empty($argv[1])) usage('Missing argument "phar-filename".');
-$pharFilename = basename($argv[1]);
-$buildFolder = dirname($argv[1]);
+if(!$opts->phar) usage('Missing option "--phar".');
+$pharFilename = basename($opts->phar);
+$buildFolder = dirname($opts->phar);
 if(!is_dir($buildFolder)) {
   mkdir($buildFolder);
 }
@@ -26,18 +56,37 @@ $buildFolder = realpath($buildFolder);
 $buildFile = $buildFolder.'/'.$pharFilename;
 
 //
-if(!empty($argv[2])) {
-  $mainFilename = $argv[2];
+if($opts->require) {
+  $mainFilename = $opts->require;
 } else {
   $mainFilename = false;
 }
 
 //
-$sourceFolder = getcwd();
+if(!$opts->source) usage('Missing option "--source".');
+$sourceFolder = $opts->source;
 
 $sourceExclude = array('.git','build-phar.php');
 $filenameInclude = '*.php';
 $filenameExclude = '.git';
+
+//
+if($opts->license) {
+  if(!file_exists($opts->license)) {
+    usage("License-file \"$opts->license\" not found.");
+  }
+  $license = file_get_contents($opts->license);
+} else {
+  $license = false;
+}
+if($opts->copyright) {
+  if(!file_exists($opts->copyright)) {
+    usage("Copyright-file \"$opts->copyright\" not found.");
+  }
+  $copyright = file_get_contents($opts->copyright);
+} else {
+  $copyright = false;
+}
 
 //
 echo "pharFilename : $pharFilename\n";
@@ -104,11 +153,16 @@ foreach($iter as $p) {
 }
 
 //
-$stub = <<<'EOF'
-#!/usr/bin/env php
-<?php
+$stub = "#!/usr/bin/env php\n<?php\n";
 
-EOF;
+if($copyright) {
+  $stub .= "\n/** $pharFilename \n".$copyright."\n */\n";
+}
+
+if($license) {
+  $stub .= "\n/** $pharFilename \n".$license."\n */\n";
+}
+
 $stub .= "if(time()-".time()." > 1.21e+6) echo \"This version of '$pharFilename' is older than 14 days!\\n\";\n";
 $stub .= "Phar::mapPhar('$pharFilename');\n";
 if($mainFilename) {
@@ -116,7 +170,7 @@ if($mainFilename) {
   $stub .= "require 'phar://$pharFilename/$mainFilename';\n";
 }
 $stub .= "__HALT_COMPILER();\n";
-// echo "$stub\n";
+echo "$stub\n";
 $phar->setStub($stub);
 
 $phar->stopBuffering();

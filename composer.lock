@@ -4,9 +4,39 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f6ee4e69189d1135fee3686190694b6e",
-    "content-hash": "b5743f4499cf738c216a9c1d48105bca",
-    "packages": [],
+    "hash": "75afc8ec490aa1db5a3bc7ba7806e5be",
+    "content-hash": "3415a4a64228a496a3406fd2d36620ac",
+    "packages": [
+        {
+            "name": "oleics/ac-minimist",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "../ac-minimist",
+                "reference": "6b655e6d987597512fd18e5eebce8c0ebd30ecbd",
+                "shasum": null
+            },
+            "require": {
+                "php": ">=4.0.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ac\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oliver Leics",
+                    "email": "oliver.leics@gmail.com"
+                }
+            ],
+            "description": "Light-weight argument option parsing for PHP."
+        }
+    ],
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
